@@ -66,6 +66,10 @@ class Task(CheckListItem):
         self.reminders = reminders if reminders else []
         self.repeatFlag = repeatFlag
 
+    @property
+    def description_with_metadata(self) -> str:
+        return (self.content or "") + f"\n\n--- HA METADATA ---\nPriority: {self.priority}"
+
     def toJSON(self):
         """Serialize Task to json."""
 

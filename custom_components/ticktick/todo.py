@@ -50,12 +50,14 @@ def _map_task(
     """Convert a TodoItem to Task."""
     modified = False
     if api_task:
-        if (item.summary or "").strip() != (api_task.title or "").strip():
-            api_task.title = item.summary
-            modified = True
-        if (item.description or "").strip() != (api_task.content or "").strip():
-            api_task.content = item.description
-            modified = True
+        # FIXME: We don't support updating summaries or descriptions because that makes
+        # rewritingthem difficult.
+        # if (item.summary or "").strip() != (api_task.title or "").strip():
+        #     api_task.title = item.summary
+        #     modified = True
+        # if (item.description or "").strip() != (api_task.content or "").strip():
+        #     api_task.content = item.description
+        #     modified = True
         
         # Handle due date comparison with proper type checking
         item_due_str = _format_date_for_comparison(item.due)
@@ -126,7 +128,7 @@ class TickTickTodoListEntity(CoordinatorEntity[TickTickCoordinator], TodoListEnt
                             if task.status == TaskStatus.COMPLETED
                             else TodoItemStatus.NEEDS_ACTION,
                             due=task.dueDate,
-                            description=task.content or None,  # Don't use empty string
+                            description=task.description_with_metadata
                         )
                     )
 
