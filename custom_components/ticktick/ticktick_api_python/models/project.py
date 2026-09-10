@@ -33,7 +33,7 @@ class Project:
         groupId: str | None,
         name: str,
         color: str | None,
-        sortOrder: int,
+        sortOrder: int | None,
         closed: bool | None,
         viewMode: ViewMode,
         permission: Permission,
@@ -60,7 +60,7 @@ class Project:
             if data.get("name")
             else "Unnamed Project",
             color=data.get("color"),
-            sortOrder=data["sortOrder"],
+            sortOrder=data.get("sortOrder", 0),
             closed=data.get("closed"),
             viewMode=ViewMode(data["viewMode"])
             if data.get("viewMode")

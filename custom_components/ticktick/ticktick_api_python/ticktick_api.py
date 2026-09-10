@@ -1,13 +1,16 @@
 """TickTick API Client."""
 
+import json
 from aiohttp import ClientResponse, ClientSession
 from custom_components.ticktick.const import (
     COMPLETE_TASK,
     CREATE_TASK,
     DELETE_TASK,
+    FILTER_TASKS,
     GET_PROJECTS,
     GET_PROJECTS_WITH_TASKS,
     GET_TASK,
+    INBOX_ID,
     UPDATE_TASK,
 )
 
@@ -81,9 +84,24 @@ class TickTickAPIClient:
         )
         return filtered_projects
 
-    async def get_project_with_tasks(self, projectId: str) -> list[ProjectWithTasks]:
+    async def get_project_with_tasks(self, projectId: str) -> ProjectWithTasks:
         """Return a dict of tasks for project."""
         response = await self._get(GET_PROJECTS_WITH_TASKS.format(projectId=projectId))
+        return ProjectWithTasks.from_dict(response)
+
+    async def get_inbox(self, returnAsJson: bool = False) -> ProjectWithTasks:
+        """Return open tasks in the inbox."""
+        # See https://developer.ticktick.com/api#/openapi?id=filter-tasks
+        query = json.dumps({ "projectIds": [ INBOX_ID ], "status": [ 0 ] })
+        tasks = await self._post(FILTER_TASKS, query)
+        if returnAsJson:
+            return tasks
+
+        response = {
+            "tasks": tasks,
+            "project": { "name": "Inbox", "id": INBOX_ID },
+        }
+        
         return ProjectWithTasks.from_dict(response)
 
     async def _get(self, url: str) -> ClientResponse:

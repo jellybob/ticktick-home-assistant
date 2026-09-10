@@ -4,6 +4,7 @@ import asyncio
 from datetime import timedelta
 import logging
 
+from custom_components.ticktick.const import INBOX_ID
 from custom_components.ticktick.ticktick_api_python.models.project import Project
 from custom_components.ticktick.ticktick_api_python.models.project_with_tasks import (
     ProjectWithTasks,
@@ -45,12 +46,14 @@ class TickTickCoordinator(DataUpdateCoordinator[list[ProjectWithTasks]]):
         """Fetch projects with tasks from the TickTick API."""
         try:
             if self._projects is None:
-                await self.async_get_projects()
+                self._projects = await self.async_get_projects()
 
             fetch_projects_with_tasks = [
                 self.api.get_project_with_tasks(project.id)
-                for project in self._projects
+                for project in self._projects if project.id != INBOX_ID
             ]
+
+            fetch_projects_with_tasks.append(self.api.get_inbox())
 
             return await asyncio.gather(*fetch_projects_with_tasks)
         except Exception as err:
@@ -60,4 +63,6 @@ class TickTickCoordinator(DataUpdateCoordinator[list[ProjectWithTasks]]):
         """Return TickTick projects fetched at most once."""
         if self._projects is None:
             self._projects = await self.api.get_projects()
+            self._projects.append(Project.from_dict({ "name": "Inbox", "id": INBOX_ID }))
+
         return self._projects

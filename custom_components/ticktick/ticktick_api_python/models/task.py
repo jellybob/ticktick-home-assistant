@@ -141,7 +141,7 @@ class Task(CheckListItem):
             desc=data.get("desc"),
             content=data.get("content"),
             priority=TaskPriority(data.get("priority", TaskPriority.NONE.value)),
-            sortOrder=data.get("sortOrder"),
+            sortOrder=data.get("sortOrder", 0),
             isAllDay=data.get("isAllDay"),
             startDate=data.get("startDate"),
             dueDate=data.get("dueDate"),
