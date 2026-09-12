@@ -98,7 +98,7 @@ class TickTickAPIClient:
             return tasks
 
         response = {
-            "tasks": tasks,
+            "tasks": tasks or [],
             "project": { "name": "Inbox", "id": INBOX_ID },
         }
         
